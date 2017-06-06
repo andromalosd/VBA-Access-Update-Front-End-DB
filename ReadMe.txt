@@ -1,0 +1,1 @@
+The purpose of this function is to distribute an access data collection database across an organization.  When structural or local data updates are made to the Front End database, this function will update the database to the latest version.  It is recommended that this function be run upon startup

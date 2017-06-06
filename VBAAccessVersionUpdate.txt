@@ -1,0 +1,45 @@
+Public Function UpdateFE()
+On Error Go To ProcError
+
+Dim sSourceFile as string 'File location of database to be copied
+Dim sDestFile as String ' File location of users database that needs updated
+Dim sAccessExePath as String 'File path of access application
+Dim IResult as Long 'Function returns an integer balue based on success of transfer
+
+'Assign source file path for sSourceFile and assign current database location for sDestFile
+
+If Application.Version>= '12.0' Then
+	sSourceFile="\\File Path\AdminCopies\DataAnalyticsCustomer.accdb"
+	sDestFile="c:\documents and settings\" & GetUserID() & "\Desktop\DataAnalyticsCustomer.accdb"
+
+Else
+	MsgBox"The file:" & vbCrLf & Chr(34) & "DataAnalyticsCustomer.mdb (Version Access 2003 or earlier) is no longer available"
+	vbCritical,"Error Updating To New Version..."
+GoTo ExitProc
+
+End If
+
+'Determine path of current Access executable
+
+sAccessExepath = SysCmd(acSysCmdAccessDir) & "MSAccess.exe"
+
+If Dir(sSourceFile) <> "" Then
+'Copy the new version of app over the existing one
+IResult = apiCopyFile(sSourceFile,sDestFile,False)
+Else
+'File missing...displayerror message
+MsgBox"The file:"&vbCrLF & Chr(34) & sSourceFile & Chr(34) & vbCrLf & vbCrLf & "is not a valid file name.  Please Contact IT", vbCritical
+
+GoToExitProc
+End If
+
+'Modify sDestFile so it can be used with the Shell fucntion
+sDestFile=""""&sDestFile & """"
+'Load new version, then close old one
+Shell sAccessExePath & sDestFile&"",vbMaximizedFocus
+DoCmd.Quit
+
+ExitProx:
+	MsgBox"Error"&Err.Number&":"&Err.Description,,"Error in Update FE event procedure..."
+
+End Function
